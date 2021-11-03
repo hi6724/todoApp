@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonText: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 22,
+    fontFamily: "BM-Y",
   },
 });

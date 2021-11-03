@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -12,6 +12,10 @@ const firebaseConfig = {
   appId: "1:749208997267:web:fee818608add36f165ac66",
 };
 export const firebaseApp = initializeApp(firebaseConfig);
+
+export const dbService = initializeFirestore(firebaseApp, {
+  experimentalForceLongPolling: true,
+});
+
 export const authService = getAuth();
-export const dbService = getFirestore();
 export const storageService = getStorage(firebaseApp);

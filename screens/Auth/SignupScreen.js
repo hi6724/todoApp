@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import * as Font from "expo-font";
 import { Button, Image, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import FormButton from "../../components/Auth/FormButton";
@@ -9,9 +8,7 @@ import { windowWidth } from "../../components/dimension";
 import { useForm } from "react-hook-form";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
 import { authService } from "../../navigation/AuthProvider";
-Font.loadAsync({
-  "Kufam-SemiBoldItalic": require("../../assets/fonts/Kufam-SemiBoldItalic.ttf"),
-});
+
 export default LoginScreen = ({ navigation }) => {
   const { register, handleSubmit, setValue } = useForm();
   const onNext = (nextOne) => {
@@ -39,10 +36,10 @@ export default LoginScreen = ({ navigation }) => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Create an account</Text>
+      <Text style={styles.text}>안녕하세요</Text>
       <FormInput
         blurOnSubmit={false}
-        placeholderText="Email"
+        placeholderText="이메일"
         iconType="user"
         autoCapitalize="none"
         autoCorrect={false}
@@ -52,7 +49,7 @@ export default LoginScreen = ({ navigation }) => {
       <FormInput
         blurOnSubmit={false}
         innerRef={passwordRef}
-        placeholderText="Password"
+        placeholderText="비밀번호"
         iconType="lock"
         secureTextEntry={true}
         onSubmitEditing={() => onNext(passwordConfirmRef)}
@@ -60,22 +57,22 @@ export default LoginScreen = ({ navigation }) => {
       />
       <FormInput
         innerRef={passwordConfirmRef}
-        placeholderText="Confirm Password"
+        placeholderText="비밀번호 확인"
         iconType="lock"
         secureTextEntry={true}
         onChangeText={(text) => setValue("passwordConfirm", text)}
         onSubmitEditing={handleSubmit(onValid)}
       />
-      <FormButton buttonTitle="Sign Up" onPress={handleSubmit(onValid)} />
+      <FormButton buttonTitle="회원가입" onPress={handleSubmit(onValid)} />
 
       <SocialButton
-        buttonTitle="Sign In with Google"
+        buttonTitle="Google로 로그인"
         btnType="google"
         color="#de4d41"
         backgroundColor="#f5e7ea"
       />
       <SocialButton
-        buttonTitle="Without Sign Up"
+        buttonTitle="회원가입 없이 진행"
         btnType="user-secret"
         color="rgba(0,0,0,0.8)"
         backgroundColor="rgba(0,0,0,0.2)"
@@ -84,7 +81,9 @@ export default LoginScreen = ({ navigation }) => {
         style={styles.forgotButton}
         onPress={() => navigation.navigate("LoginScreen")}
       >
-        <Text style={styles.navButtonText}>Have an account ? Sign in</Text>
+        <Text style={styles.navButtonText}>
+          이미 아이디가 있으신가요? 로그인
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -101,9 +100,9 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontFamily: "Kufam-SemiBoldItalic",
-    fontSize: 28,
-    marginBottom: 10,
+    fontFamily: "BM-Pro",
+    fontSize: 38,
+    marginBottom: 30,
     color: "#051d5f",
   },
   navButton: {
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
     marginVertical: 35,
   },
   navButtonText: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "500",
     color: "#2e64e5",
   },

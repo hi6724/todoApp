@@ -41,7 +41,7 @@ export default LoginScreen = ({ navigation }) => {
       <FormInput
         value={watch("email")}
         blurOnSubmit={false}
-        placeholderText="Email"
+        placeholderText="이메일"
         iconType="user"
         autoCapitalize="none"
         autoCorrect={false}
@@ -51,22 +51,22 @@ export default LoginScreen = ({ navigation }) => {
       <FormInput
         value={watch("password")}
         innerRef={passwordRef}
-        placeholderText="Password"
+        placeholderText="비밀번호"
         iconType="lock"
         secureTextEntry={true}
         onChangeText={(text) => setValue("password", text)}
         onSubmitEditing={handleSubmit(onValid)}
       />
 
-      <FormButton buttonTitle="Sign In" onPress={handleSubmit(onValid)} />
+      <FormButton buttonTitle="로그인" onPress={handleSubmit(onValid)} />
       <SocialButton
-        buttonTitle="Sign In with Google"
+        buttonTitle="Google로 로그인"
         btnType="google"
         color="#de4d41"
         backgroundColor="#f5e7ea"
       />
       <SocialButton
-        buttonTitle="Without Sign In"
+        buttonTitle="회원가입 없이 진행"
         btnType="user-secret"
         color="rgba(0,0,0,0.8)"
         backgroundColor="rgba(0,0,0,0.2)"
@@ -76,7 +76,7 @@ export default LoginScreen = ({ navigation }) => {
         onPress={() => navigation.navigate("SignUpScreen")}
       >
         <Text style={styles.navButtonText}>
-          Don't have an account? Create here
+          아직 회원이 아니신가요? 회원가입
         </Text>
       </TouchableOpacity>
     </View>
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     marginVertical: 35,
   },
   navButtonText: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "500",
     color: "#2e64e5",
   },
