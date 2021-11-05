@@ -17,7 +17,10 @@ import {
   where,
 } from "@firebase/firestore";
 import { dbService } from "../navigation/AuthProvider";
+import { subTitle } from "../components/utils/subTitle";
 export default Home = ({ loggedInUser }) => {
+  let random;
+  const [motivation, setMotivation] = useState();
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [todos, setTodos] = useState([]);
   const [checkTodo, setCheckTodo] = useState([]);
@@ -65,6 +68,8 @@ export default Home = ({ loggedInUser }) => {
     });
   };
   useEffect(() => {
+    random = Math.floor(Math.random() * subTitle.length);
+    setMotivation(subTitle[random]);
     getTodo();
   }, []);
   const navigation = useNavigation();
@@ -90,8 +95,10 @@ export default Home = ({ loggedInUser }) => {
       ),
     },
   ];
+
   return (
     <>
+      <SubHeader>{motivation}</SubHeader>
       <Container contentContainerStyle={{ alignItems: "center" }}>
         {todos.map((todo) => {
           if (todo !== null) {
@@ -137,7 +144,12 @@ const Container = styled.ScrollView`
   flex: 1;
   padding: 15px 0px;
 `;
-
+const SubHeader = styled.Text`
+  font-family: "BM-E";
+  padding: 10px 20px;
+  font-size: 23px;
+  color: rgba(0, 0, 0, 0.7);
+`;
 const ActionBtn = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
