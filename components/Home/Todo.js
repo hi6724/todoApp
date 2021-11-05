@@ -15,6 +15,9 @@ export default Todo = ({ todo }) => {
   const handleEdit = () => {
     navigation.navigate("Edit", todo);
   };
+  const handleDelete = () => {
+    alert("DELETE");
+  };
   const handleCheck = async (checkBox) => {
     if (checkBox) {
       await updateDoc(doc(dbService, `todo/${todo.id}`), { isChecked: true });
@@ -26,7 +29,11 @@ export default Todo = ({ todo }) => {
     }
   };
   return (
-    <ItemContainer windowWidth={windowWidth} style={styles.shadow}>
+    <ItemContainer
+      onPress={handleEdit}
+      windowWidth={windowWidth}
+      style={styles.shadow}
+    >
       <View style={{ flexDirection: "row" }}>
         <BouncyCheckbox
           isChecked={todo.isChecked}
@@ -39,13 +46,20 @@ export default Todo = ({ todo }) => {
           <DateText>{`${deadlineMonth}.${deadlineDate} 까지`}</DateText>
         </View>
       </View>
-      <TouchableOpacity style={{ margin: 10 }} onPress={handleEdit}>
-        <Ionicons name={"create-outline"} size={25} color={"grey"} />
+      <TouchableOpacity
+        style={{
+          justifyContent: "center",
+          flexDirection: "row",
+          alignItems: "center",
+        }}
+        onPress={handleDelete}
+      >
+        <Ionicons name={"trash-outline"} size={25} color={"grey"} />
       </TouchableOpacity>
     </ItemContainer>
   );
 };
-const ItemContainer = styled.View`
+const ItemContainer = styled.TouchableOpacity`
   padding: 15px 15px;
   justify-content: space-between;
   flex-direction: row;
