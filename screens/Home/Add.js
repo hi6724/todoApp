@@ -16,15 +16,21 @@ import { dbService } from "../../navigation/AuthProvider";
 export default Add = ({ loggedInUser }) => {
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   const today = new Date();
-  const [startDate, setStartDate] = useState(today);
-  const [deadline, setDeadline] = useState(today);
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  let date = today.getDate();
+  if (date < 10) {
+    date = `0${date}`;
+  }
+  const withoutDate = new Date(`${year}-${month + 1}-${date}T03:00:00.000Z`);
+  const [startDate, setStartDate] = useState(withoutDate);
+  const [deadline, setDeadline] = useState(withoutDate);
   const [todo, setTodo] = useState(null);
   const navigation = useNavigation();
   const [showCalendar, setShowCalendar] = useState(false);
   const onDateChange = (date, type) => {
     if (type === "START_DATE") {
       setStartDate(date);
-      console.log(date);
     } else {
       setDeadline(date);
     }
@@ -32,15 +38,14 @@ export default Add = ({ loggedInUser }) => {
   //   mutation to firebase
   const onValid = () => {
     const { todo } = getValues();
-    const newStartDate = startDate.toISOString().split("T")[0];
-    const newDeadline = deadline.toISOString().split("T")[0];
     const todoObj = {
       uid: loggedInUser.uid,
       todo,
-      startDate: newStartDate,
-      deadline: newDeadline,
+      startDate: startDate.valueOf(),
+      deadline: deadline.valueOf(),
+      isFinished: false,
+      isChecked: false,
     };
-
     addDoc(collection(dbService, "todo"), todoObj);
     navigation.navigate("Home2");
   };

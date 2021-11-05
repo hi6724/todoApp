@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import Home from "../screens/Home";
 import Add from "../screens/Home/Add";
+import Edit from "../screens/Home/Edit";
 import Recommend from "../screens/Home/Recommend";
 
 const Stack = createStackNavigator();
@@ -24,6 +25,7 @@ export default HomeStackNav = ({ loggedInUser }) => {
         name="Recommend"
         children={() => <Recommend loggedInUser={loggedInUser} />}
       />
+      <Stack.Screen name="Edit" component={Edit} />
     </Stack.Navigator>
   );
 };

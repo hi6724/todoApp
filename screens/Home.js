@@ -1,32 +1,67 @@
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Button, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import styled from "styled-components/native";
 import { windowWidth } from "../components/dimension";
 import { FloatingAction } from "react-native-floating-action";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import Todo from "../components/Home/Todo";
+import Collapsible from "react-native-collapsible";
 import {
   collection,
-  getDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
+  where,
 } from "@firebase/firestore";
 import { dbService } from "../navigation/AuthProvider";
 export default Home = ({ loggedInUser }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [todos, setTodos] = useState([]);
+  const [checkTodo, setCheckTodo] = useState([]);
   const getTodo = async () => {
-    const q = query(collection(dbService, "todo"), orderBy("deadline", "desc"));
-
+    const q = query(
+      collection(dbService, "todo"),
+      where("uid", "==", loggedInUser.uid),
+      where("isFinished", "==", false),
+      orderBy("deadline", "asc")
+    );
     await onSnapshot(q, (snapShot) => {
-      const todoArray = snapShot.docs.map((doc) => {
-        return {
-          id: doc.id,
-          ...doc.data(),
-        };
+      const todoArray = snapShot.docs.map((todoDoc) => {
+        if (!todoDoc.data().isChecked) {
+          return {
+            id: todoDoc.id,
+            ...todoDoc.data(),
+          };
+        } else {
+          return null;
+        }
+      });
+      const checkedArray = snapShot.docs.map((todoDoc) => {
+        if (todoDoc.data().isChecked) {
+          const today = new Date();
+          console.log(todoDoc.data().todo);
+          console.log("TODAY", today.valueOf());
+          console.log("DEADLINE", todoDoc.data().deadline);
+          if (today.valueOf() > todoDoc.data().deadline) {
+            updateDoc(doc(dbService, `todo/${todoDoc.id}`), {
+              isFinished: true,
+            });
+            return null;
+          }
+          return {
+            id: todoDoc.id,
+            ...todoDoc.data(),
+          };
+        } else {
+          return null;
+        }
       });
       setTodos(todoArray);
+
+      setCheckTodo(checkedArray);
     });
   };
   useEffect(() => {
@@ -55,26 +90,52 @@ export default Home = ({ loggedInUser }) => {
       ),
     },
   ];
-
   return (
-    <Container>
-      {todos.map((todo) => (
-        <Todo key={todo.id} todo={todo} />
-      ))}
+    <>
+      <Container contentContainerStyle={{ alignItems: "center" }}>
+        {todos.map((todo) => {
+          if (todo !== null) {
+            return <Todo key={todo.id} todo={todo} />;
+          }
+        })}
+        <ActionBtn
+          onPress={() => setIsCollapsed((prev) => !prev)}
+          style={styles.btn}
+        >
+          <View style={styles.innerBtn}>
+            {isCollapsed ? (
+              <Ionicons
+                name={"caret-forward-outline"}
+                size={16}
+                color={"#fff"}
+              />
+            ) : (
+              <Ionicons name={"caret-down-outline"} size={16} color={"#fff"} />
+            )}
 
+            <Text style={styles.btnText}>완료됨</Text>
+          </View>
+        </ActionBtn>
+        <Collapsible collapsed={isCollapsed}>
+          {checkTodo.map((todo) => {
+            if (todo !== null) {
+              return <Todo key={todo.id} todo={todo} />;
+            }
+          })}
+        </Collapsible>
+      </Container>
       <FloatingAction
         color="rgba(0,0,0,0.3)"
         overlayColor="transparent"
         actions={actions}
       />
-    </Container>
+    </>
   );
 };
 
-const Container = styled.View`
+const Container = styled.ScrollView`
   flex: 1;
   padding: 15px 0px;
-  align-items: center;
 `;
 
 const ActionBtn = styled.TouchableOpacity`
@@ -91,3 +152,24 @@ const ActionText = styled.Text`
   font-size: 18px;
   color: white;
 `;
+const styles = StyleSheet.create({
+  btn: {
+    flex: 1,
+    backgroundColor: "transparent",
+    width: "90%",
+  },
+  btnText: {
+    marginLeft: 5,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  innerBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 5,
+    paddingLeft: 10,
+    paddingRight: 20,
+    paddingVertical: 5,
+    backgroundColor: "rgba(10, 10, 10, 0.8)",
+  },
+});

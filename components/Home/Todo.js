@@ -4,19 +4,42 @@ import styled from "styled-components/native";
 import { windowWidth } from "../dimension";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { doc, updateDoc } from "@firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
+import { dbService } from "../../navigation/AuthProvider";
 export default Todo = ({ todo }) => {
-  const newDeadline = todo.deadline.split("-");
-  console.log(todo);
+  const navigation = useNavigation();
+  const newDeadline = new Date(todo.deadline);
+  const deadlineMonth = newDeadline.getMonth() + 1;
+  const deadlineDate = newDeadline.getDate();
+  const handleEdit = () => {
+    navigation.navigate("Edit", todo);
+  };
+  const handleCheck = async (checkBox) => {
+    if (checkBox) {
+      await updateDoc(doc(dbService, `todo/${todo.id}`), { isChecked: true });
+    } else {
+      await updateDoc(doc(dbService, `todo/${todo.id}`), {
+        isChecked: false,
+        isFinished: false,
+      });
+    }
+  };
   return (
     <ItemContainer windowWidth={windowWidth} style={styles.shadow}>
       <View style={{ flexDirection: "row" }}>
-        <BouncyCheckbox fillColor="red" unfillColor="#FFFFFF" />
+        <BouncyCheckbox
+          isChecked={todo.isChecked}
+          fillColor="red"
+          unfillColor="#FFFFFF"
+          onPress={handleCheck}
+        />
         <View style={{ justifyContent: "center" }}>
           <TodoText>{todo.todo}</TodoText>
-          <Date>{`${newDeadline[1]}.${newDeadline[2]} 까지`}</Date>
+          <DateText>{`${deadlineMonth}.${deadlineDate} 까지`}</DateText>
         </View>
       </View>
-      <TouchableOpacity style={{ margin: 10 }} onPress={() => alert("Edit")}>
+      <TouchableOpacity style={{ margin: 10 }} onPress={handleEdit}>
         <Ionicons name={"create-outline"} size={25} color={"grey"} />
       </TouchableOpacity>
     </ItemContainer>
@@ -36,7 +59,7 @@ const TodoText = styled.Text`
   font-size: 20px;
   font-family: "BM-Pro";
 `;
-const Date = styled.Text`
+const DateText = styled.Text`
   font-size: 16px;
   font-family: "BM-Air";
   opacity: 0.3;
