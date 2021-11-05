@@ -26,7 +26,6 @@ export default Add = ({ loggedInUser }) => {
   const [startDate, setStartDate] = useState(withoutDate);
   const [deadline, setDeadline] = useState(withoutDate);
   const [todo, setTodo] = useState(null);
-  const [toDos, setToDos] = useState({});
   const navigation = useNavigation();
   const [showCalendar, setShowCalendar] = useState(false);
   const onDateChange = (date, type) => {
@@ -36,11 +35,8 @@ export default Add = ({ loggedInUser }) => {
       setDeadline(date);
     }
   };
-  const saveToDos = async (toSave) => {
-    await AsyncStorage.setItem("@toDos", JSON.stringify(toSave));
-  };
   //   mutation to firebase
-  const onValid = async () => {
+  const onValid = () => {
     const { todo } = getValues();
     const todoObj = {
       uid: loggedInUser.uid,
@@ -50,12 +46,7 @@ export default Add = ({ loggedInUser }) => {
       isFinished: false,
       isChecked: false,
     };
-    const newToDos = {
-      ...toDos,
-      [Date.now()]: todoObj,
-    };
-    setToDos(newToDos);
-    await saveToDos(newToDos);
+    addDoc(collection(dbService, "todo"), todoObj);
     navigation.navigate("Home2");
   };
   useEffect(() => {

@@ -18,7 +18,7 @@ import {
 } from "@firebase/firestore";
 import { dbService } from "../navigation/AuthProvider";
 export default Home = ({ loggedInUser }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [todos, setTodos] = useState([]);
   const [checkTodo, setCheckTodo] = useState([]);
   const getTodo = async () => {

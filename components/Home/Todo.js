@@ -1,10 +1,10 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import styled from "styled-components/native";
 import { windowWidth } from "../dimension";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { doc, updateDoc } from "@firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "@firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { dbService } from "../../navigation/AuthProvider";
 export default Todo = ({ todo }) => {
@@ -16,7 +16,22 @@ export default Todo = ({ todo }) => {
     navigation.navigate("Edit", todo);
   };
   const handleDelete = () => {
-    alert("DELETE");
+    Alert.alert(
+      "TODO 삭제",
+      "정말 지우시겠습니까?",
+      [
+        {
+          text: "취소",
+        },
+        {
+          text: "삭제",
+          onPress: () => {
+            deleteDoc(doc(dbService, `todo/${todo.id}`));
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
   const handleCheck = async (checkBox) => {
     if (checkBox) {
@@ -54,7 +69,7 @@ export default Todo = ({ todo }) => {
         }}
         onPress={handleDelete}
       >
-        <Ionicons name={"trash-outline"} size={25} color={"grey"} />
+        <Ionicons name={"trash-outline"} size={30} color={"grey"} />
       </TouchableOpacity>
     </ItemContainer>
   );
