@@ -9,8 +9,10 @@ import { windowWidth } from "../../components/dimension";
 import { authService, firebaseApp } from "../../navigation/AuthProvider";
 import { getAuth } from "firebase/auth";
 import { signInWithEmailAndPassword } from "@firebase/auth";
+import { useNavigation } from "@react-navigation/native";
 
-export default LoginScreen = ({ navigation }) => {
+export default LoginScreen = ({ setLoggedInUser }) => {
+  const navigation = useNavigation();
   const passwordRef = useRef();
   const { register, handleSubmit, getValues, setValue, watch } = useForm();
   const onNext = (nextOne) => {
@@ -66,6 +68,7 @@ export default LoginScreen = ({ navigation }) => {
         backgroundColor="#f5e7ea"
       />
       <SocialButton
+        onPress={() => setLoggedInUser({ uid: "incognito" })}
         buttonTitle="회원가입 없이 진행"
         btnType="user-secret"
         color="rgba(0,0,0,0.8)"

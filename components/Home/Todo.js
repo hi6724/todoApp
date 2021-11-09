@@ -7,13 +7,14 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
-export default Todo = ({ id, todo, toDos, setToDos, isFinished }) => {
+export default Todo = ({ uid, id, todo, toDos, setToDos, isFinished }) => {
   const navigation = useNavigation();
   const newDeadline = new Date(todo.deadline);
   const deadlineMonth = newDeadline.getMonth() + 1;
   const deadlineDate = newDeadline.getDate();
   const handleEdit = () => {
     navigation.navigate("Edit", {
+      uid,
       id,
       todo,
       toDos,
@@ -31,14 +32,14 @@ export default Todo = ({ id, todo, toDos, setToDos, isFinished }) => {
         {
           text: "삭제",
           onPress: async () => {
-            const s = await AsyncStorage.getItem("@toDos");
+            const s = await AsyncStorage.getItem(uid);
             let tempToDos;
             if (s) {
               tempToDos = JSON.parse(s);
             }
             const newAllToDos = tempToDos.filter((todo) => todo.id !== id);
             const newToDos = toDos.filter((todo) => todo.id !== id);
-            await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+            await AsyncStorage.setItem(uid, JSON.stringify(newAllToDos));
             setToDos(newToDos);
           },
         },
@@ -47,7 +48,7 @@ export default Todo = ({ id, todo, toDos, setToDos, isFinished }) => {
     );
   };
   const handleCheck = async (checkBox) => {
-    const s = await AsyncStorage.getItem("@toDos");
+    const s = await AsyncStorage.getItem(uid);
     let tempToDos;
     if (s) {
       tempToDos = JSON.parse(s);
@@ -68,7 +69,7 @@ export default Todo = ({ id, todo, toDos, setToDos, isFinished }) => {
         return todo;
       }
     });
-    await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+    await AsyncStorage.setItem(uid, JSON.stringify(newAllToDos));
     const newToDos = toDos.map((todo) => {
       if (todo.id === id) {
         return {

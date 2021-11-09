@@ -11,7 +11,8 @@ import FormInput from "../../components/Auth/FormInput";
 import CalendarPicker from "react-native-calendar-picker";
 import { useForm } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
-export default Add = ({ loggedInUser, toDos, setToDos }) => {
+export default Add = ({ uid, toDos, setToDos }) => {
+  console.log("ADD", uid);
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   const today = new Date();
   const year = today.getFullYear();
@@ -36,7 +37,7 @@ export default Add = ({ loggedInUser, toDos, setToDos }) => {
   };
   //   mutation to firebase
   const onValid = async () => {
-    const s = await AsyncStorage.getItem("@toDos");
+    const s = await AsyncStorage.getItem(uid);
     let tempToDos;
     if (s) {
       tempToDos = JSON.parse(s);
@@ -44,7 +45,7 @@ export default Add = ({ loggedInUser, toDos, setToDos }) => {
     const { todo } = getValues();
     const todoObj = {
       id: Date.now(),
-      uid: loggedInUser.uid,
+      uid: uid,
       todo,
       startDate: startDate.valueOf(),
       deadline: deadline.valueOf(),
@@ -52,13 +53,13 @@ export default Add = ({ loggedInUser, toDos, setToDos }) => {
       isChecked: false,
     };
     let newAllToDos;
-    if (tempToDos !== null) {
+    if (tempToDos !== undefined) {
       newAllToDos = [...tempToDos, todoObj];
     } else {
       newAllToDos = [todoObj];
     }
     let newToDos;
-    if (tempToDos !== null) {
+    if (tempToDos !== undefined) {
       newToDos = [...toDos, todoObj];
     } else {
       newToDos = [todoObj];
@@ -67,7 +68,7 @@ export default Add = ({ loggedInUser, toDos, setToDos }) => {
       return a.deadline - b.deadline;
     });
     setToDos(newToDos);
-    await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+    await AsyncStorage.setItem(uid, JSON.stringify(newAllToDos));
     navigation.navigate("Home2");
     // addDoc(collection(dbService, "todo"), todoObj);
   };

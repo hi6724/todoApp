@@ -12,6 +12,7 @@ import ProfileStackNav from "./ProfileStackNav";
 const Tabs = createBottomTabNavigator();
 
 export default Nav = ({ loggedInUser, setLoggedInUser }) => {
+  const { uid } = loggedInUser;
   const [allToDos, setAllToDos] = useState([]);
   const [toDos, setToDos] = useState([]);
   const [finishedToDos, setFinishedToDos] = useState([]);
@@ -35,7 +36,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
     return now;
   };
   const loadToDos = async () => {
-    const s = await AsyncStorage.getItem("@toDos");
+    const s = await AsyncStorage.getItem(uid);
     if (s) {
       const tempToDos = JSON.parse(s);
       const tempAllToDos = [];
@@ -119,7 +120,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       >
         {() => (
           <HomeStackNav
-            loggedInUser={loggedInUser}
+            uid={uid}
             toDos={toDos}
             setToDos={setToDos}
             allToDos={allToDos}
@@ -157,7 +158,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       >
         {() => (
           <ProfileStackNav
-            loggedInUser={loggedInUser}
+            uid={uid}
             setLoggedInUser={setLoggedInUser}
             finishedToDos={finishedToDos}
             failedToDos={failedToDos}

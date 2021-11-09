@@ -5,11 +5,17 @@ import SignUpScreen from "../screens/Auth/SignupScreen";
 
 const Stack = createStackNavigator();
 
-export default AuthNav = () => {
+export default AuthNav = ({ setLoggedInUser }) => {
   return (
     <Stack.Navigator screenOptions={{ header: () => null }}>
-      <Stack.Screen name="LoginScreen" component={LoginScreen} />
-      <Stack.Screen name="SignUpScreen" component={SignUpScreen} />
+      <Stack.Screen
+        name="LoginScreen"
+        children={() => <LoginScreen setLoggedInUser={setLoggedInUser} />}
+      ></Stack.Screen>
+      <Stack.Screen
+        name="SignUpScreen"
+        children={() => <SignUpScreen setLoggedInUser={setLoggedInUser} />}
+      ></Stack.Screen>
     </Stack.Navigator>
   );
 };

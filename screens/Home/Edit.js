@@ -15,7 +15,7 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default Edit = ({ route }) => {
   const {
-    params: { id, todo, toDos, setToDos },
+    params: { uid, id, todo, toDos, setToDos },
   } = route;
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   const today = new Date();
@@ -39,7 +39,7 @@ export default Edit = ({ route }) => {
   };
   //   mutation to firebase
   const onValid = async () => {
-    const s = await AsyncStorage.getItem("@toDos");
+    const s = await AsyncStorage.getItem(uid);
     let tempToDos;
     if (s) {
       tempToDos = JSON.parse(s);
@@ -80,7 +80,7 @@ export default Edit = ({ route }) => {
     });
 
     setToDos(newToDos);
-    await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+    await AsyncStorage.setItem(uid, JSON.stringify(newAllToDos));
     navigation.goBack();
     // await updateDoc(doc(dbService, `todo/${todo.id}`), todoObj);
   };

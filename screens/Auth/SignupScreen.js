@@ -8,8 +8,10 @@ import { windowWidth } from "../../components/dimension";
 import { useForm } from "react-hook-form";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
 import { authService } from "../../navigation/AuthProvider";
+import { useNavigation } from "@react-navigation/native";
 
-export default LoginScreen = ({ navigation }) => {
+export default LoginScreen = ({ setLoggedInUser }) => {
+  const navigation = useNavigation();
   const { register, handleSubmit, setValue } = useForm();
   const onNext = (nextOne) => {
     nextOne?.current?.focus();
@@ -72,6 +74,7 @@ export default LoginScreen = ({ navigation }) => {
         backgroundColor="#f5e7ea"
       />
       <SocialButton
+        onPress={() => setLoggedInUser({ uid: "incognito" })}
         buttonTitle="회원가입 없이 진행"
         btnType="user-secret"
         color="rgba(0,0,0,0.8)"

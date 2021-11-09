@@ -7,7 +7,7 @@ import Recommend from "../screens/Home/Recommend";
 
 const Stack = createStackNavigator();
 export default HomeStackNav = ({
-  loggedInUser,
+  uid,
   toDos,
   setToDos,
   allToDos,
@@ -23,7 +23,7 @@ export default HomeStackNav = ({
         name="Home2"
         children={() => (
           <Home
-            loggedInUser={loggedInUser}
+            uid={uid}
             toDos={toDos}
             setToDos={setToDos}
             allToDos={allToDos}
@@ -35,7 +35,7 @@ export default HomeStackNav = ({
         name="Add"
         children={() => (
           <Add
-            loggedInUser={loggedInUser}
+            uid={uid}
             toDos={toDos}
             setToDos={setToDos}
             allToDos={allToDos}
@@ -43,10 +43,7 @@ export default HomeStackNav = ({
           />
         )}
       />
-      <Stack.Screen
-        name="Recommend"
-        children={() => <Recommend loggedInUser={loggedInUser} />}
-      />
+      <Stack.Screen name="Recommend" children={() => <Recommend uid={uid} />} />
       <Stack.Screen name="Edit" component={Edit} />
     </Stack.Navigator>
   );

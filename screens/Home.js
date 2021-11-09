@@ -21,13 +21,7 @@ import { dbService } from "../navigation/AuthProvider";
 import { subTitle } from "../components/utils/subTitle";
 import CollapsedBtn from "../components/Home/CollapsedBtn";
 import store from "../redux/store";
-export default Home = ({
-  loggedInUser,
-  toDos,
-  setToDos,
-  allToDos,
-  setAllToDos,
-}) => {
+export default Home = ({ uid, toDos, setToDos, allToDos, setAllToDos }) => {
   let random;
   const [motivation, setMotivation] = useState();
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -111,6 +105,7 @@ export default Home = ({
               if (!todo.isChecked) {
                 return (
                   <Todo
+                    uid={uid}
                     key={todo.id}
                     id={todo.id}
                     todo={todo}
@@ -151,6 +146,7 @@ export default Home = ({
                 if (todo.isChecked) {
                   return (
                     <Todo
+                      uid={uid}
                       key={todo.id}
                       id={todo.id}
                       todo={todo}

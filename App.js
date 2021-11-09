@@ -40,7 +40,7 @@ export default function App() {
       <Provider store={store}>
         <NavigationContainer>
           {loggedInUser === null ? (
-            <AuthNav />
+            <AuthNav setLoggedInUser={setLoggedInUser} />
           ) : (
             <Nav
               loggedInUser={loggedInUser}
