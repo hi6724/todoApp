@@ -43,7 +43,13 @@ export default HomeStackNav = ({
           />
         )}
       />
-      <Stack.Screen name="Recommend" children={() => <Recommend uid={uid} />} />
+
+      <Stack.Screen
+        name="Recommend"
+        children={() => (
+          <Recommend uid={uid} toDos={toDos} setToDos={setToDos} />
+        )}
+      />
       <Stack.Screen name="Edit" component={Edit} />
     </Stack.Navigator>
   );

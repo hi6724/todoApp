@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HomeStackNav from "./HomeStackNav";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileStackNav from "./ProfileStackNav";
+import FeedBackStackNav from "./FeedBackStackNav";
 
 const Tabs = createBottomTabNavigator();
 
@@ -49,13 +50,15 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       tempToDos.map((todo) => {
         tempAllToDos.push(todo);
         if (todo.isChecked === true) {
-          if (todo.deadline < date.valueOf()) {
+          if (todo.deadline + 86400000 < date.valueOf()) {
             finished.push(todo);
           } else {
             newToDo.push(todo);
           }
         } else {
-          if (todo.deadline < date.valueOf()) {
+          if (todo.deadline + 86400000 < date.valueOf()) {
+            console.log("NOW", date.valueOf());
+            console.log("DEADLINE", todo.deadline);
             failed.push(todo);
           } else {
             newToDo.push(todo);
@@ -66,7 +69,6 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       setToDos(newToDo);
       setFinishedToDos(finished);
       setFailedToDos(failed);
-      console.log(failedToDos);
     }
   };
 
@@ -141,7 +143,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
           },
         }}
       >
-        {() => <Home loggedInUser={loggedInUser} />}
+        {() => <FeedBackStackNav />}
       </Tabs.Screen>
 
       <Tabs.Screen
@@ -158,7 +160,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       >
         {() => (
           <ProfileStackNav
-            uid={uid}
+            loggedInUser={loggedInUser}
             setLoggedInUser={setLoggedInUser}
             finishedToDos={finishedToDos}
             failedToDos={failedToDos}

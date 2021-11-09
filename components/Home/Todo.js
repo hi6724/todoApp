@@ -53,7 +53,6 @@ export default Todo = ({ uid, id, todo, toDos, setToDos, isFinished }) => {
     if (s) {
       tempToDos = JSON.parse(s);
     }
-    console.log(tempToDos);
     const newAllToDos = tempToDos.map((todo) => {
       if (todo.id === id) {
         return {

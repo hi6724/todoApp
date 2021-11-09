@@ -24,6 +24,7 @@ export default Profile = ({
 }) => {
   const navigation = useNavigation();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isValid, setIsValid] = useState(loggedInUser.uid !== "incognito");
 
   const userLogOut = async () => {
     await signOut(authService);
@@ -36,9 +37,15 @@ export default Profile = ({
           resizeMode="contain"
           source={require("../assets/profile.png")}
         />
-        <Username>유저 이름</Username>
+        <Username>{isValid ? "유저이름" : "incognito"}</Username>
       </AvatarContainer>
-      <WhiteBtn onPress={() => navigation.navigate("Info")}>
+      <WhiteBtn
+        onPress={() => {
+          isValid
+            ? navigation.navigate("Info", { loggedInUser })
+            : alert("로그인후 이용 할 수 있습니다");
+        }}
+      >
         <BtnText>개인정보</BtnText>
       </WhiteBtn>
       <WhiteBtn onPress={() => setIsCollapsed((prev) => !prev)}>

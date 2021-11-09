@@ -12,7 +12,6 @@ import CalendarPicker from "react-native-calendar-picker";
 import { useForm } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
 export default Add = ({ uid, toDos, setToDos }) => {
-  console.log("ADD", uid);
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   const today = new Date();
   const year = today.getFullYear();
