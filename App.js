@@ -3,11 +3,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNav from "./navigation/AuthNav";
 import { authService } from "./navigation/AuthProvider";
 import { onAuthStateChanged } from "@firebase/auth";
-import { Text, View } from "react-native";
+import { LogBox, Text, View } from "react-native";
 import Nav from "./navigation/Nav";
 import { useFonts } from "@expo-google-fonts/inter";
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
 export default function App() {
+  LogBox.ignoreLogs(["Setting a timer"]);
   const [loggedInUser, setLoggedInUser] = useState(null);
   let [fontsLoaded] = useFonts({
     "BM-Pro": require("./assets/fonts/BM/BMHANNAPro.ttf"),
@@ -34,13 +37,18 @@ export default function App() {
     );
   } else {
     return (
-      <NavigationContainer>
-        {loggedInUser === null ? (
-          <AuthNav />
-        ) : (
-          <Nav loggedInUser={loggedInUser} setLoggedInUser={setLoggedInUser} />
-        )}
-      </NavigationContainer>
+      <Provider store={store}>
+        <NavigationContainer>
+          {loggedInUser === null ? (
+            <AuthNav />
+          ) : (
+            <Nav
+              loggedInUser={loggedInUser}
+              setLoggedInUser={setLoggedInUser}
+            />
+          )}
+        </NavigationContainer>
+      </Provider>
     );
   }
 }

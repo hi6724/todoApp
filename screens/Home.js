@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Button, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import styled from "styled-components/native";
 import { windowWidth } from "../components/dimension";
@@ -18,12 +19,19 @@ import {
 } from "@firebase/firestore";
 import { dbService } from "../navigation/AuthProvider";
 import { subTitle } from "../components/utils/subTitle";
-export default Home = ({ loggedInUser }) => {
+import CollapsedBtn from "../components/Home/CollapsedBtn";
+import store from "../redux/store";
+export default Home = ({
+  loggedInUser,
+  toDos,
+  setToDos,
+  allToDos,
+  setAllToDos,
+}) => {
   let random;
   const [motivation, setMotivation] = useState();
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [todos, setTodos] = useState([]);
-  const [checkTodo, setCheckTodo] = useState([]);
+
   const getTodo = async () => {
     const q = query(
       collection(dbService, "todo"),
@@ -45,9 +53,6 @@ export default Home = ({ loggedInUser }) => {
       const checkedArray = snapShot.docs.map((todoDoc) => {
         if (todoDoc.data().isChecked) {
           const today = new Date();
-          console.log(todoDoc.data().todo);
-          console.log("TODAY", today.valueOf());
-          console.log("DEADLINE", todoDoc.data().deadline);
           if (today.valueOf() > todoDoc.data().deadline) {
             updateDoc(doc(dbService, `todo/${todoDoc.id}`), {
               isFinished: true,
@@ -67,18 +72,18 @@ export default Home = ({ loggedInUser }) => {
       setCheckTodo(checkedArray);
     });
   };
+
   useEffect(() => {
     random = Math.floor(Math.random() * subTitle.length);
     setMotivation(subTitle[random]);
-    getTodo();
-  }, []);
+  }, [toDos]);
   const navigation = useNavigation();
   const actions = [
     {
       name: "Recommend",
       margin: 0,
       render: () => (
-        <ActionBtn onPress={() => navigation.navigate("Recommend")}>
+        <ActionBtn key={1} onPress={() => navigation.navigate("Recommend")}>
           <Ionicons name={"heart"} size={20} color={"white"} />
           <ActionText>할일추천</ActionText>
         </ActionBtn>
@@ -88,7 +93,7 @@ export default Home = ({ loggedInUser }) => {
       name: "Add",
       margin: 0,
       render: () => (
-        <ActionBtn onPress={() => navigation.navigate("Add")}>
+        <ActionBtn key={2} onPress={() => navigation.navigate("Add")}>
           <Ionicons name={"add"} size={20} color={"white"} />
           <ActionText>추가</ActionText>
         </ActionBtn>
@@ -100,35 +105,63 @@ export default Home = ({ loggedInUser }) => {
     <>
       <SubHeader>{motivation}</SubHeader>
       <Container contentContainerStyle={{ alignItems: "center" }}>
-        {todos.map((todo) => {
-          if (todo !== null) {
-            return <Todo key={todo.id} todo={todo} />;
-          }
-        })}
-        <ActionBtn
-          onPress={() => setIsCollapsed((prev) => !prev)}
-          style={styles.btn}
-        >
-          <View style={styles.innerBtn}>
-            {isCollapsed ? (
-              <Ionicons
-                name={"caret-forward-outline"}
-                size={16}
-                color={"#fff"}
-              />
-            ) : (
-              <Ionicons name={"caret-down-outline"} size={16} color={"#fff"} />
-            )}
-
-            <Text style={styles.btnText}>완료됨</Text>
-          </View>
-        </ActionBtn>
-        <Collapsible collapsed={isCollapsed}>
-          {checkTodo.map((todo) => {
+        {toDos.length > 0 &&
+          toDos.map((todo) => {
             if (todo !== null) {
-              return <Todo key={todo.id} todo={todo} />;
+              if (!todo.isChecked) {
+                return (
+                  <Todo
+                    key={todo.id}
+                    id={todo.id}
+                    todo={todo}
+                    isFinished={false}
+                    toDos={toDos}
+                    setToDos={setToDos}
+                    allToDos={allToDos}
+                    setAllToDos={setAllToDos}
+                  />
+                );
+              }
             }
           })}
+        {/* {Object.keys(toDos).map((key) => {
+          if (!toDos[key].isChecked) {
+            return (
+              <Todo
+                key={key}
+                id={key}
+                todo={toDos[key]}
+                toDos={toDos}
+                setToDos={setToDos}
+                isFinished={false}
+              />
+            );
+          }
+        })} */}
+        <CollapsedBtn
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          text="완료됨"
+        />
+
+        <Collapsible collapsed={isCollapsed}>
+          {toDos.length > 0 &&
+            toDos.map((todo) => {
+              if (todo !== null) {
+                if (todo.isChecked) {
+                  return (
+                    <Todo
+                      key={todo.id}
+                      id={todo.id}
+                      todo={todo}
+                      toDos={toDos}
+                      setToDos={setToDos}
+                      isFinished={false}
+                    />
+                  );
+                }
+              }
+            })}
         </Collapsible>
       </Container>
       <FloatingAction

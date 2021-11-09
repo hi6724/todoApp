@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { Keyboard, Text, TextInput, View } from "react-native";
 import {
@@ -10,10 +11,7 @@ import FormInput from "../../components/Auth/FormInput";
 import CalendarPicker from "react-native-calendar-picker";
 import { useForm } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
-import { addDoc, collection } from "@firebase/firestore";
-import { dbService } from "../../navigation/AuthProvider";
-
-export default Add = ({ loggedInUser }) => {
+export default Add = ({ loggedInUser, toDos, setToDos }) => {
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   const today = new Date();
   const year = today.getFullYear();
@@ -25,9 +23,10 @@ export default Add = ({ loggedInUser }) => {
   const withoutDate = new Date(`${year}-${month + 1}-${date}T03:00:00.000Z`);
   const [startDate, setStartDate] = useState(withoutDate);
   const [deadline, setDeadline] = useState(withoutDate);
-  const [todo, setTodo] = useState(null);
+  const [tempToDo, setTempToDo] = useState(null);
   const navigation = useNavigation();
   const [showCalendar, setShowCalendar] = useState(false);
+
   const onDateChange = (date, type) => {
     if (type === "START_DATE") {
       setStartDate(date);
@@ -36,9 +35,15 @@ export default Add = ({ loggedInUser }) => {
     }
   };
   //   mutation to firebase
-  const onValid = () => {
+  const onValid = async () => {
+    const s = await AsyncStorage.getItem("@toDos");
+    let tempToDos;
+    if (s) {
+      tempToDos = JSON.parse(s);
+    }
     const { todo } = getValues();
     const todoObj = {
+      id: Date.now(),
       uid: loggedInUser.uid,
       todo,
       startDate: startDate.valueOf(),
@@ -46,12 +51,30 @@ export default Add = ({ loggedInUser }) => {
       isFinished: false,
       isChecked: false,
     };
-    addDoc(collection(dbService, "todo"), todoObj);
+    let newAllToDos;
+    if (tempToDos !== null) {
+      newAllToDos = [...tempToDos, todoObj];
+    } else {
+      newAllToDos = [todoObj];
+    }
+    let newToDos;
+    if (tempToDos !== null) {
+      newToDos = [...toDos, todoObj];
+    } else {
+      newToDos = [todoObj];
+    }
+    newToDos.sort(function (a, b) {
+      return a.deadline - b.deadline;
+    });
+    setToDos(newToDos);
+    await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
     navigation.navigate("Home2");
+    // addDoc(collection(dbService, "todo"), todoObj);
   };
   useEffect(() => {
     register("todo", { required: true });
   }, [register]);
+
   return (
     <TouchableWithoutFeedback
       style={{ height: "100%" }}

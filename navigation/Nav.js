@@ -6,11 +6,17 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HomeStackNav from "./HomeStackNav";
-import styled from "styled-components";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ProfileStackNav from "./ProfileStackNav";
 
 const Tabs = createBottomTabNavigator();
 
 export default Nav = ({ loggedInUser, setLoggedInUser }) => {
+  const [allToDos, setAllToDos] = useState([]);
+  const [toDos, setToDos] = useState([]);
+  const [finishedToDos, setFinishedToDos] = useState([]);
+  const [failedToDos, setFailedToDos] = useState([]);
+
   const dayArr = ["월", "화", "수", "목", "금", "토", "일"];
   const date = new Date();
   const today = date.getDate();
@@ -23,18 +29,56 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
     let t = "오전";
     if (hours >= 12) {
       t = "오후";
-      hours - 12;
+      hours = hours - 12;
     }
     const now = `${t} ${hours}:${minutes}`;
     return now;
   };
+  const loadToDos = async () => {
+    const s = await AsyncStorage.getItem("@toDos");
+    if (s) {
+      const tempToDos = JSON.parse(s);
+      const tempAllToDos = [];
+      const newToDo = [];
+      const finished = [];
+      const failed = [];
+      tempToDos.sort(function (a, b) {
+        return a.deadline - b.deadline;
+      });
+      tempToDos.map((todo) => {
+        tempAllToDos.push(todo);
+        if (todo.isChecked === true) {
+          if (todo.deadline < date.valueOf()) {
+            finished.push(todo);
+          } else {
+            newToDo.push(todo);
+          }
+        } else {
+          if (todo.deadline < date.valueOf()) {
+            failed.push(todo);
+          } else {
+            newToDo.push(todo);
+          }
+        }
+      });
+      setAllToDos(tempAllToDos);
+      setToDos(newToDo);
+      setFinishedToDos(finished);
+      setFailedToDos(failed);
+      console.log(failedToDos);
+    }
+  };
+
   const [clock, setClock] = useState(setTime());
 
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     setClock(setTime);
-  //   }, 20000);
-  // }, []);
+  useEffect(() => {
+    setInterval(() => {
+      setClock(setTime);
+    }, 40000);
+  }, []);
+  useEffect(() => {
+    loadToDos();
+  }, []);
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({
@@ -72,37 +116,78 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
             );
           },
         }}
-        // children={() => <Home loggedInUser={loggedInUser} />}
       >
-        {() => <HomeStackNav loggedInUser={loggedInUser} />}
+        {() => (
+          <HomeStackNav
+            loggedInUser={loggedInUser}
+            toDos={toDos}
+            setToDos={setToDos}
+            allToDos={allToDos}
+            setAllToDos={setAllToDos}
+          />
+        )}
       </Tabs.Screen>
+
       <Tabs.Screen
         name="Feedback"
-        children={() => <Home loggedInUser={loggedInUser} />}
-      />
+        options={{
+          header: ({}) => {
+            return (
+              <SafeAreaView style={styles.headerView}>
+                <Text style={styles.headerText}>피드백</Text>
+              </SafeAreaView>
+            );
+          },
+        }}
+      >
+        {() => <Home loggedInUser={loggedInUser} />}
+      </Tabs.Screen>
 
       <Tabs.Screen
         name="Profile"
-        children={() => (
-          <Profile
+        options={{
+          header: ({}) => {
+            return (
+              <SafeAreaView style={styles.headerView}>
+                <Text style={styles.headerText}>프로필</Text>
+              </SafeAreaView>
+            );
+          },
+        }}
+      >
+        {() => (
+          <ProfileStackNav
             loggedInUser={loggedInUser}
             setLoggedInUser={setLoggedInUser}
+            finishedToDos={finishedToDos}
+            failedToDos={failedToDos}
+            setFinishedToDos={setFinishedToDos}
+            setFailedToDos={setFailedToDos}
+            allToDos={allToDos}
+            setAllToDos={setAllToDos}
           />
         )}
-      />
+      </Tabs.Screen>
     </Tabs.Navigator>
   );
 };
 
 const styles = StyleSheet.create({
   homeHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     paddingHorizontal: 25,
     marginTop: 15,
   },
   date: {
     fontFamily: "BM-Pro",
     opacity: 0.3,
+  },
+  headerText: {
+    fontFamily: "BM-Pro",
+    fontSize: 26,
+  },
+  headerView: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 25,
   },
 });

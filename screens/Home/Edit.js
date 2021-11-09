@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Keyboard, StyleSheet, TextInput, View } from "react-native";
 import {
   TouchableOpacity,
@@ -10,13 +11,12 @@ import FormInput from "../../components/Auth/FormInput";
 import CalendarPicker from "react-native-calendar-picker";
 import { useForm } from "react-hook-form";
 import { useNavigation } from "@react-navigation/native";
-import { addDoc, collection, doc, updateDoc } from "@firebase/firestore";
-import { dbService } from "../../navigation/AuthProvider";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default Edit = ({ route }) => {
-  const { params } = route;
-
+  const {
+    params: { id, todo, toDos, setToDos },
+  } = route;
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   const today = new Date();
   const year = today.getFullYear();
@@ -25,11 +25,11 @@ export default Edit = ({ route }) => {
   if (date < 10) {
     date = `0${date}`;
   }
-  const [startDate, setStartDate] = useState(params.startDate);
-  const [deadline, setDeadline] = useState(params.deadline);
+  const [startDate, setStartDate] = useState(todo.startDate);
+  const [deadline, setDeadline] = useState(todo.deadline);
   const navigation = useNavigation();
   const [showCalendar, setShowCalendar] = useState(true);
-  const [isChecked, setIsChecked] = useState(params.isChecked);
+  const [isChecked, setIsChecked] = useState(todo.isChecked);
   const onDateChange = (date, type) => {
     if (type === "START_DATE") {
       setStartDate(date);
@@ -39,19 +39,54 @@ export default Edit = ({ route }) => {
   };
   //   mutation to firebase
   const onValid = async () => {
-    const { todo } = getValues();
-    const todoObj = {
-      todo,
-      startDate: startDate.valueOf(),
-      deadline: deadline.valueOf(),
-      isChecked: isChecked,
-    };
-    await updateDoc(doc(dbService, `todo/${params.id}`), todoObj);
-    navigation.navigate("Home2");
+    const s = await AsyncStorage.getItem("@toDos");
+    let tempToDos;
+    if (s) {
+      tempToDos = JSON.parse(s);
+    }
+    const { todoText } = getValues();
+    const newAllToDos = tempToDos.map((todo) => {
+      if (todo.id === id) {
+        return {
+          deadline: deadline.valueOf(),
+          id: todo.id,
+          isChecked,
+          isFinished: todo.isFinished,
+          startDate: startDate.valueOf(),
+          todo: todoText,
+          uid: todo.uid,
+        };
+      } else {
+        return todo;
+      }
+    });
+    const newToDos = toDos.map((todo) => {
+      if (todo.id === id) {
+        return {
+          deadline: deadline.valueOf(),
+          id: todo.id,
+          isChecked,
+          isFinished: todo.isFinished,
+          startDate: startDate.valueOf(),
+          todo: todoText,
+          uid: todo.uid,
+        };
+      } else {
+        return todo;
+      }
+    });
+    newToDos.sort(function (a, b) {
+      return a.deadline - b.deadline;
+    });
+
+    setToDos(newToDos);
+    await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+    navigation.goBack();
+    // await updateDoc(doc(dbService, `todo/${todo.id}`), todoObj);
   };
   useEffect(() => {
-    register("todo", { required: true });
-    setValue("todo", params.todo);
+    register("todoText", { required: true });
+    setValue("todoText", todo.todo);
   }, [register]);
   return (
     <TouchableWithoutFeedback
@@ -68,8 +103,8 @@ export default Edit = ({ route }) => {
             onPress={() => setIsChecked((prev) => !prev)}
           />
           <TextInput
-            value={watch("todo")}
-            onChangeText={(text) => setValue("todo", text)}
+            value={watch("todoText")}
+            onChangeText={(text) => setValue("todoText", text)}
             style={styles.title}
           />
         </View>
@@ -82,7 +117,7 @@ export default Edit = ({ route }) => {
               allowRangeSelection
               allowBackwardRangeSelect
               onDateChange={onDateChange}
-              minDate={new Date()}
+              // minDate={new Date()}
             />
           )}
         </View>
@@ -90,7 +125,11 @@ export default Edit = ({ route }) => {
         <BtnContainer>
           <BasicBtn
             windowWidth={windowWidth}
-            onPress={() => navigation.navigate("Home2")}
+            onPress={() => {
+              navigation.goBack();
+
+              // navigation.navigate("Home2")
+            }}
           >
             <BtnText>취소</BtnText>
           </BasicBtn>

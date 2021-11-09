@@ -1,19 +1,24 @@
 import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import styled from "styled-components/native";
 import { windowWidth } from "../dimension";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { deleteDoc, doc, updateDoc } from "@firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
-import { dbService } from "../../navigation/AuthProvider";
-export default Todo = ({ todo }) => {
+
+export default Todo = ({ id, todo, toDos, setToDos, isFinished }) => {
   const navigation = useNavigation();
   const newDeadline = new Date(todo.deadline);
   const deadlineMonth = newDeadline.getMonth() + 1;
   const deadlineDate = newDeadline.getDate();
   const handleEdit = () => {
-    navigation.navigate("Edit", todo);
+    navigation.navigate("Edit", {
+      id,
+      todo,
+      toDos,
+      setToDos,
+    });
   };
   const handleDelete = () => {
     Alert.alert(
@@ -25,8 +30,16 @@ export default Todo = ({ todo }) => {
         },
         {
           text: "삭제",
-          onPress: () => {
-            deleteDoc(doc(dbService, `todo/${todo.id}`));
+          onPress: async () => {
+            const s = await AsyncStorage.getItem("@toDos");
+            let tempToDos;
+            if (s) {
+              tempToDos = JSON.parse(s);
+            }
+            const newAllToDos = tempToDos.filter((todo) => todo.id !== id);
+            const newToDos = toDos.filter((todo) => todo.id !== id);
+            await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+            setToDos(newToDos);
           },
         },
       ],
@@ -34,14 +47,56 @@ export default Todo = ({ todo }) => {
     );
   };
   const handleCheck = async (checkBox) => {
-    if (checkBox) {
-      await updateDoc(doc(dbService, `todo/${todo.id}`), { isChecked: true });
-    } else {
-      await updateDoc(doc(dbService, `todo/${todo.id}`), {
-        isChecked: false,
-        isFinished: false,
-      });
+    const s = await AsyncStorage.getItem("@toDos");
+    let tempToDos;
+    if (s) {
+      tempToDos = JSON.parse(s);
     }
+    console.log(tempToDos);
+    const newAllToDos = tempToDos.map((todo) => {
+      if (todo.id === id) {
+        return {
+          deadline: todo.deadline,
+          id: todo.id,
+          isChecked: checkBox,
+          isFinished: todo.isFinished,
+          startDate: todo.startDate,
+          todo: todo.todo,
+          uid: todo.uid,
+        };
+      } else {
+        return todo;
+      }
+    });
+    await AsyncStorage.setItem("@toDos", JSON.stringify(newAllToDos));
+    const newToDos = toDos.map((todo) => {
+      if (todo.id === id) {
+        return {
+          deadline: todo.deadline,
+          id: todo.id,
+          isChecked: checkBox,
+          isFinished: todo.isFinished,
+          startDate: todo.startDate,
+          todo: todo.todo,
+          uid: todo.uid,
+        };
+      } else {
+        return todo;
+      }
+    });
+    setToDos(newToDos);
+
+    // const newToDos = { ...toDos };
+    // newToDos[id].isChecked = checkBox;
+
+    // if (checkBox) {
+    //   await updateDoc(doc(dbService, `todo/${todo.id}`), { isChecked: true });
+    // } else {
+    //   await updateDoc(doc(dbService, `todo/${todo.id}`), {
+    //     isChecked: false,
+    //     isFinished: false,
+    //   });
+    // }
   };
   return (
     <ItemContainer
@@ -57,7 +112,7 @@ export default Todo = ({ todo }) => {
           onPress={handleCheck}
         />
         <View style={{ justifyContent: "center" }}>
-          <TodoText>{todo.todo}</TodoText>
+          <TodoText isFinished={isFinished}>{todo.todo}</TodoText>
           <DateText>{`${deadlineMonth}.${deadlineDate} 까지`}</DateText>
         </View>
       </View>
@@ -87,6 +142,9 @@ const ItemContainer = styled.TouchableOpacity`
 const TodoText = styled.Text`
   font-size: 20px;
   font-family: "BM-Pro";
+  text-decoration-line: ${(props) =>
+    props.isFinished ? "line-through" : "none"};
+  color: ${(props) => (props.isFinished ? "red" : "black")};
 `;
 const DateText = styled.Text`
   font-size: 16px;
