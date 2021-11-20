@@ -46,7 +46,6 @@ export default EditModal = ({
       transparent={true}
       visible={modalVisible}
       onRequestClose={() => {
-        Alert.alert("Modal has been closed.");
         setModalVisible(!modalVisible);
       }}
     >
@@ -62,11 +61,15 @@ export default EditModal = ({
                 setValue("username", displayName ? displayName : "이름변경");
                 setModalVisible(!modalVisible);
               }}
+              style={{ backgroundColor: "rgba(255, 77, 79, 0.2)" }}
             >
-              <BtnText>취소</BtnText>
+              <BtnText style={{ color: "#a82e2e" }}>취소</BtnText>
             </BtnView>
-            <BtnView onPress={handleSubmit(onValid)}>
-              <BtnText>변경</BtnText>
+            <BtnView
+              style={{ backgroundColor: "rgba(82, 196, 26, 0.2)" }}
+              onPress={handleSubmit(onValid)}
+            >
+              <BtnText style={{ color: "#52c41a" }}>변경</BtnText>
             </BtnView>
           </BtnContainer>
         </ModalView>
@@ -75,13 +78,14 @@ export default EditModal = ({
   );
 };
 const BtnView = styled.TouchableOpacity`
-  padding: 15px;
+  padding: 15px 25px;
   border-radius: 15px;
   background-color: red;
   margin: 5px 10px;
 `;
 const BtnText = styled.Text`
   font-size: 15px;
+  font-family: "BM-Air";
 `;
 const BtnContainer = styled.View`
   flex-direction: row;

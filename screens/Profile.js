@@ -127,13 +127,7 @@ export default Profile = ({
       >
         <BtnText>이름변경</BtnText>
       </WhiteBtn>
-      <WhiteBtn
-        onPress={() => {
-          isValid ? handleUpload() : alert("로그인후 이용 할 수 있습니다");
-        }}
-      >
-        <BtnText>온라인 백업</BtnText>
-      </WhiteBtn>
+
       <WhiteBtn onPress={() => setIsCollapsed((prev) => !prev)}>
         <BtnText>{isCollapsed ? "내가 지금까지 해온 일들" : "숨기기"}</BtnText>
       </WhiteBtn>
@@ -149,20 +143,6 @@ export default Profile = ({
             <FailText>{failedToDos.length}</FailText>
           </FailOverview>
         </Overview>
-        {/* <ScrollView>
-          {finishedToDos &&
-            finishedToDos.map((todo) => (
-              <Todo
-                key={todo.id}
-                id={todo.id}
-                todo={todo}
-                toDos={finishedToDos}
-                setToDos={setFinishedToDos}
-                isFinished={true}
-                uid={todo.uid}
-              />
-            ))}
-        </ScrollView> */}
       </Collapsible>
       <WhiteBtn onPress={userLogOut}>
         <BtnText>LOGOUT</BtnText>

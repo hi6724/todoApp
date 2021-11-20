@@ -51,13 +51,13 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       tempToDos.map((todo) => {
         tempAllToDos.push(todo);
         if (todo.isChecked === true) {
-          if (todo.deadline - 86400000 < date.valueOf()) {
+          if (todo.deadline + 86400000 < date.valueOf()) {
             finished.push(todo);
           } else {
             newToDo.push(todo);
           }
         } else {
-          if (todo.deadline - 86400000 < date.valueOf()) {
+          if (todo.deadline + 86400000 < date.valueOf()) {
             failed.push(todo);
           } else {
             newToDo.push(todo);

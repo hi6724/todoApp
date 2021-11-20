@@ -23,10 +23,16 @@ export default Feedback = ({ data }) => {
   const theDayOfWeek = today.getDay();
 
   const tempStartDate = new Date(
-    `${theYear}-${theMonth + 1}-${theDate - theDayOfWeek + 1}T03:00:00.000Z`
+    theYear,
+    theMonth,
+    theDate - theDayOfWeek + 1,
+    -12
   );
   const tempEndDate = new Date(
-    `${theYear}-${theMonth + 1}-${theDate - theDayOfWeek + 7}T03:00:00.000Z`
+    theYear,
+    theMonth,
+    theDate - theDayOfWeek + 7,
+    -12
   );
   const [startDate, setStartDate] = useState(tempStartDate);
   const [endDate, setEndDate] = useState(tempEndDate);
@@ -150,7 +156,10 @@ export default Feedback = ({ data }) => {
               source={profileImage[level].image}
             />
             <Username>
-              Lv{level + 1}.{profileImage[level].text}
+              Lv{level + 1}.
+              {loggedInUser.displayName
+                ? loggedInUser.displayName
+                : profileImage[level].text}
             </Username>
           </View>
         </View>
