@@ -9,10 +9,11 @@ import HomeStackNav from "./HomeStackNav";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileStackNav from "./ProfileStackNav";
 import FeedBackStackNav from "./FeedBackStackNav";
-
+import { useNavigation } from "@react-navigation/native";
 const Tabs = createBottomTabNavigator();
 
 export default Nav = ({ loggedInUser, setLoggedInUser }) => {
+  const navigation = useNavigation();
   const { uid } = loggedInUser;
   const [allToDos, setAllToDos] = useState([]);
   const [toDos, setToDos] = useState([]);
@@ -50,15 +51,13 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
       tempToDos.map((todo) => {
         tempAllToDos.push(todo);
         if (todo.isChecked === true) {
-          if (todo.deadline + 86400000 < date.valueOf()) {
+          if (todo.deadline - 86400000 < date.valueOf()) {
             finished.push(todo);
           } else {
             newToDo.push(todo);
           }
         } else {
-          if (todo.deadline + 86400000 < date.valueOf()) {
-            console.log("NOW", date.valueOf());
-            console.log("DEADLINE", todo.deadline);
+          if (todo.deadline - 86400000 < date.valueOf()) {
             failed.push(todo);
           } else {
             newToDo.push(todo);
@@ -113,7 +112,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
             return (
               <SafeAreaView style={styles.homeHeader}>
                 <Text style={styles.date}>
-                  {`${currentMonth}.${today} (${dayArr[day - 1]}) ${clock}`}
+                  {`${currentMonth}.${today} ${clock}`}
                 </Text>
               </SafeAreaView>
             );
@@ -137,13 +136,26 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
           header: ({}) => {
             return (
               <SafeAreaView style={styles.headerView}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <Ionicons name={"chevron-back-outline"} size={25} />
+                </TouchableOpacity>
                 <Text style={styles.headerText}>피드백</Text>
               </SafeAreaView>
             );
           },
         }}
       >
-        {() => <FeedBackStackNav />}
+        {() => (
+          <FeedBackStackNav
+            toDos={toDos}
+            loggedInUser={loggedInUser}
+            setLoggedInUser={setLoggedInUser}
+            finishedToDos={finishedToDos}
+            failedToDos={failedToDos}
+            setFinishedToDos={setFinishedToDos}
+            setFailedToDos={setFailedToDos}
+          />
+        )}
       </Tabs.Screen>
 
       <Tabs.Screen
@@ -152,6 +164,9 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
           header: ({}) => {
             return (
               <SafeAreaView style={styles.headerView}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <Ionicons name={"chevron-back-outline"} size={25} />
+                </TouchableOpacity>
                 <Text style={styles.headerText}>프로필</Text>
               </SafeAreaView>
             );
@@ -187,10 +202,11 @@ const styles = StyleSheet.create({
   headerText: {
     fontFamily: "BM-Pro",
     fontSize: 26,
+    marginLeft: 20,
   },
   headerView: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 25,
   },
 });

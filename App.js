@@ -24,6 +24,9 @@ export default function App() {
         const userObj = {
           uid: user.uid,
           photoURL: user.photoURL,
+          displayName: user.displayName,
+          email: user.email,
+          createdAt: user.metadata.creationTime,
         };
         setLoggedInUser(userObj);
       }

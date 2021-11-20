@@ -37,9 +37,10 @@ export default LoginScreen = ({ setLoggedInUser }) => {
     <View style={styles.container}>
       <Image
         resizeMode="contain"
-        source={require("../../assets/logo.png")}
+        source={require("../../assets/profile/1.png")}
         style={styles.logo}
       />
+      <Text style={styles.text}>투두 메이트</Text>
       <FormInput
         value={watch("email")}
         blurOnSubmit={false}
@@ -96,12 +97,12 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   logo: {
-    marginBottom: 50,
     height: 150,
     width: windowWidth,
   },
   text: {
     fontSize: 28,
+    fontFamily: "BM-Pro",
     marginBottom: 10,
     color: "#051d5f",
   },

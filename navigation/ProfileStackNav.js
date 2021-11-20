@@ -1,8 +1,10 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
+import Detail from "../screens/Feedback/Detail";
 import Edit from "../screens/Home/Edit";
 import Profile from "../screens/Profile";
 import Info from "../screens/Profile/Info";
+import Upload from "../screens/Profile/Upload";
 
 const Stack = createStackNavigator();
 export default ProfileStackNav = ({
@@ -34,9 +36,11 @@ export default ProfileStackNav = ({
       />
       <Stack.Screen
         name="Info"
-        children={() => <Info loggedInUser={loggedInUser} />}
+        children={() => (
+          <Info loggedInUser={loggedInUser} setLoggedInUser={setLoggedInUser} />
+        )}
       />
-      <Stack.Screen name="Edit" component={Edit} />
+      <Stack.Screen name="Detail" component={Detail} />
     </Stack.Navigator>
   );
 };
