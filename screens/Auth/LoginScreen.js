@@ -62,12 +62,12 @@ export default LoginScreen = ({ setLoggedInUser }) => {
       />
 
       <FormButton buttonTitle="로그인" onPress={handleSubmit(onValid)} />
-      <SocialButton
+      {/* <SocialButton
         buttonTitle="Google로 로그인"
         btnType="google"
         color="#de4d41"
         backgroundColor="#f5e7ea"
-      />
+      /> */}
       <SocialButton
         onPress={() => setLoggedInUser({ uid: "incognito" })}
         buttonTitle="회원가입 없이 진행"

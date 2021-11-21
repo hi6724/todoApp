@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Dimensions, Image, Text, View } from "react-native";
 import styled from "styled-components";
 import * as Progress from "react-native-progress";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "react-native-vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { BarChart, LineChart, StackedBarChart } from "react-native-chart-kit";
 export default Feedback = ({ data }) => {
   const profileImage = [
     { text: "알", image: require("../../assets/profile/1.png") },
@@ -36,6 +37,19 @@ export default Feedback = ({ data }) => {
   );
   const [startDate, setStartDate] = useState(tempStartDate);
   const [endDate, setEndDate] = useState(tempEndDate);
+  var step;
+  var arr = [];
+  for (step = 0; step < 7; step++) {
+    const nowDate = new Date(
+      theYear,
+      theMonth,
+      theDate - theDayOfWeek + 1 + step,
+      -12
+    );
+    arr.push(nowDate.toISOString().slice(5, 10));
+  }
+  const [labels, setLabels] = useState(arr);
+
   const handleDate = (type) => {
     if (type === "prev") {
       startDate.setDate(startDate.getDate() - 7);
@@ -55,6 +69,17 @@ export default Feedback = ({ data }) => {
         theDate - theDayOfWeek + 7,
         -12
       );
+      arr = [];
+      for (step = 0; step < 7; step++) {
+        const nowDate = new Date(
+          theYear,
+          theMonth,
+          theDate - theDayOfWeek + 1 + step,
+          -12
+        );
+        arr.push(nowDate.toISOString().slice(5, 10));
+      }
+      setLabels(arr);
       setStartDate(tempStartDate);
       setEndDate(tempEndDate);
     }
@@ -76,6 +101,17 @@ export default Feedback = ({ data }) => {
         theDate - theDayOfWeek + 7,
         -12
       );
+      arr = [];
+      for (step = 0; step < 7; step++) {
+        const nowDate = new Date(
+          theYear,
+          theMonth,
+          theDate - theDayOfWeek + 1 + step,
+          -12
+        );
+        arr.push(nowDate.toISOString().slice(5, 10));
+      }
+      setLabels(arr);
       setStartDate(tempStartDate);
       setEndDate(tempEndDate);
     }
@@ -86,13 +122,11 @@ export default Feedback = ({ data }) => {
     loggedInUser,
     setFailedToDos,
     setFinishedToDos,
-    toDos,
   } = data;
   const [exp, setExp] = useState(
     finishedToDos.length / 5 - Math.floor(finishedToDos.length / 5)
   );
   const [level, setLevel] = useState(Math.floor(finishedToDos.length / 5));
-  console.log(level);
   let tempArr = finishedToDos.filter(
     (todoObj) =>
       todoObj.deadline >= startDate.valueOf() &&
@@ -119,10 +153,6 @@ export default Feedback = ({ data }) => {
     );
     setFailedToDosByDate(tempFTodosArr);
   }, [startDate, failedToDos, finishedToDos]);
-  useEffect(() => {
-    if (exp > 1) {
-    }
-  }, []);
   const goToDetail = (todos, isFinished) => {
     navigation.navigate("Detail", {
       todos,
@@ -130,6 +160,24 @@ export default Feedback = ({ data }) => {
       setToDos: isFinished ? setFinishedToDos : setFailedToDos,
     });
   };
+  const tempData = {
+    labels,
+    datasets: [
+      {
+        data: [20, 45, 28, 80, 99, 43],
+        color: () => `rgba(82, 196, 26, ${1})`,
+        strokeWidth: 3,
+      },
+      {
+        data: [15, 23, 34, 13, 42, 3],
+        color: () => `rgba(255, 77, 79, ${1})`,
+        strokeWidth: 3,
+      },
+    ],
+    legend: ["성공", "실패"],
+  };
+
+  const screenWidth = Dimensions.get("window").width;
   return (
     <Container>
       <FirstItem>
@@ -145,7 +193,7 @@ export default Feedback = ({ data }) => {
             <BigFont>
               <Text style={{ fontWeight: "bold" }}>
                 {finishedToDos.length}개
-              </Text>{" "}
+              </Text>
               달성
             </BigFont>
           </View>
@@ -203,12 +251,42 @@ export default Feedback = ({ data }) => {
           <FailText>실패</FailText>
           <FailText>{failedToDosByDate.length}</FailText>
         </FailOverview>
+        {/* <Statics>
+          <LineChart
+            data={tempData}
+            width={screenWidth - 45}
+            height={220}
+            chartConfig={{
+              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              backgroundGradientFrom: "rgba(255, 255, 255, 0.2)",
+              backgroundGradientTo: "rgba(255, 255, 255, 0.2)",
+              decimalPlaces: 0, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+              propsForDots: {
+                r: "5",
+                strokeWidth: "1",
+                stroke: "rgb(255,255,255)",
+              },
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
+              borderRadius: 16,
+            }}
+          />
+        </Statics> */}
       </Overview>
     </Container>
   );
 };
-
-const Container = styled.View`
+const Statics = styled.View`
+  margin: 25px 0px;
+`;
+const Container = styled.ScrollView`
   padding: 15px 25px;
 `;
 const Overview = styled.View`
