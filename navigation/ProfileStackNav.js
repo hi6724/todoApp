@@ -14,6 +14,7 @@ export default ProfileStackNav = ({
   failedToDos,
   setFinishedToDos,
   setFailedToDos,
+  setToDos,
 }) => {
   return (
     <Stack.Navigator
@@ -31,6 +32,7 @@ export default ProfileStackNav = ({
             failedToDos={failedToDos}
             setFinishedToDos={setFinishedToDos}
             setFailedToDos={setFailedToDos}
+            setToDos={setToDos}
           />
         )}
       />

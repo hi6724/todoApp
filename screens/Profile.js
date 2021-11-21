@@ -37,6 +37,7 @@ export default Profile = ({
   failedToDos,
   setFinishedToDos,
   setFailedToDos,
+  setToDos,
 }) => {
   const profileData = [
     { text: "알", image: require("../assets/profile/1.png") },
@@ -51,6 +52,8 @@ export default Profile = ({
   const [level, setLevel] = useState(Math.floor(finishedToDos.length / 5));
   const navigation = useNavigation();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isUploadCollapsed, setIsUploadCollapsed] = useState(true);
+
   const [isValid, setIsValid] = useState(loggedInUser.uid !== "incognito");
 
   const userLogOut = async () => {
@@ -66,9 +69,9 @@ export default Profile = ({
   };
   const [modalVisible, setModalVisible] = useState(false);
   const handleUpload = async () => {
-    const s = await AsyncStorage.getItem(loggedInUser.uid);
     let isUpdate = false;
     let id;
+    const s = await AsyncStorage.getItem(loggedInUser.uid);
     let tempToDos;
     if (s) {
       tempToDos = JSON.parse(s);
@@ -91,6 +94,56 @@ export default Profile = ({
       });
     }
     alert("업로드 완료");
+  };
+  const getToDos = async () => {
+    const s = await AsyncStorage.getItem(loggedInUser.uid);
+    let tempToDos;
+    let firebaseToDos;
+    if (s) {
+      tempToDos = JSON.parse(s);
+    }
+    const q = query(collection(dbService, loggedInUser.uid));
+    const documentSnapshots = await getDocs(q);
+    documentSnapshots.forEach((s) => {
+      firebaseToDos = s.data().toDos;
+    });
+    let idArr = [];
+    tempToDos.map((hello) => {
+      idArr.push(hello.id);
+    });
+    firebaseToDos.filter((toDo) => {
+      if (!idArr.includes(toDo.id)) {
+        tempToDos.push(toDo);
+      }
+    });
+
+    const newToDo = [];
+    const finished = [];
+    const failed = [];
+    const date = new Date();
+    tempToDos.sort(function (a, b) {
+      return a.deadline - b.deadline;
+    });
+    tempToDos.map((todo) => {
+      if (todo.isChecked === true) {
+        if (todo.deadline + 86400000 < date.valueOf()) {
+          finished.push(todo);
+        } else {
+          newToDo.push(todo);
+        }
+      } else {
+        if (todo.deadline + 86400000 < date.valueOf()) {
+          failed.push(todo);
+        } else {
+          newToDo.push(todo);
+        }
+      }
+    });
+
+    setToDos(newToDo);
+    setFinishedToDos(finished);
+    setFailedToDos(failed);
+    await AsyncStorage.setItem(loggedInUser.uid, JSON.stringify(tempToDos));
   };
   return (
     <Container>
@@ -127,6 +180,29 @@ export default Profile = ({
       >
         <BtnText>이름변경</BtnText>
       </WhiteBtn>
+      <WhiteBtn onPress={() => setIsUploadCollapsed((prev) => !prev)}>
+        <BtnText>
+          {isUploadCollapsed ? "온라인 백업 및 가져오기" : "숨기기"}
+        </BtnText>
+      </WhiteBtn>
+      <Collapsible collapsed={isUploadCollapsed}>
+        <Overview>
+          <UploadBtn
+            onPress={() => {
+              isValid ? handleUpload() : alert("로그인후 이용 할 수 있습니다");
+            }}
+          >
+            <UploadText>온라인 백업</UploadText>
+          </UploadBtn>
+          <UploadBtn
+            onPress={() => {
+              isValid ? getToDos() : alert("로그인후 이용 할 수 있습니다");
+            }}
+          >
+            <UploadText>가져오기</UploadText>
+          </UploadBtn>
+        </Overview>
+      </Collapsible>
 
       <WhiteBtn onPress={() => setIsCollapsed((prev) => !prev)}>
         <BtnText>{isCollapsed ? "내가 지금까지 해온 일들" : "숨기기"}</BtnText>
@@ -191,6 +267,10 @@ const OverviewItem = styled.TouchableOpacity`
   justify-content: space-between;
   padding: 15px 20px;
 `;
+const UploadBtn = styled(OverviewItem)`
+  background-color: rgba(46, 100, 229, 0.2);
+  border-color: #a82e2e;
+`;
 const FailOverview = styled(OverviewItem)`
   background-color: rgba(255, 77, 79, 0.2);
   border-color: #a82e2e;
@@ -202,6 +282,9 @@ const AccentFont = styled.Text`
 `;
 const FailText = styled(AccentFont)`
   color: #a82e2e;
+`;
+const UploadText = styled(AccentFont)`
+  color: rgb(46, 100, 229);
 `;
 const styles = StyleSheet.create({
   shadow: {

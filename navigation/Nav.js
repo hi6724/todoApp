@@ -182,7 +182,7 @@ export default Nav = ({ loggedInUser, setLoggedInUser }) => {
             setFinishedToDos={setFinishedToDos}
             setFailedToDos={setFailedToDos}
             allToDos={allToDos}
-            setAllToDos={setAllToDos}
+            setToDos={setToDos}
           />
         )}
       </Tabs.Screen>
