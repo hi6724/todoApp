@@ -4,8 +4,9 @@ import styled from "styled-components";
 import * as Progress from "react-native-progress";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "react-native-vector-icons";
+import CalendarPicker from "react-native-calendar-picker";
 import { useNavigation } from "@react-navigation/native";
-import { BarChart, LineChart, StackedBarChart } from "react-native-chart-kit";
+import { LineChart } from "react-native-chart-kit";
 export default Feedback = ({ data }) => {
   const profileImage = [
     { text: "알", image: require("../../assets/profile/1.png") },
@@ -152,6 +153,10 @@ export default Feedback = ({ data }) => {
         todoObj.deadline <= endDate.valueOf()
     );
     setFailedToDosByDate(tempFTodosArr);
+    finishedToDosByDate.map((todo) => {
+      console.log("HELLO", new Date(todo.deadline));
+    });
+    failedToDosByDate.map((todo) => {});
   }, [startDate, failedToDos, finishedToDos]);
   const goToDetail = (todos, isFinished) => {
     navigation.navigate("Detail", {
@@ -164,20 +169,20 @@ export default Feedback = ({ data }) => {
     labels,
     datasets: [
       {
-        data: [20, 45, 28, 80, 99, 43],
+        data: [0, 0, 0, 1, 0, 0],
         color: () => `rgba(82, 196, 26, ${1})`,
         strokeWidth: 3,
       },
       {
-        data: [15, 23, 34, 13, 42, 3],
+        data: [1, 2, 0, 0, 0, 3],
         color: () => `rgba(255, 77, 79, ${1})`,
         strokeWidth: 3,
       },
     ],
-    legend: ["성공", "실패"],
   };
 
   const screenWidth = Dimensions.get("window").width;
+  console.log(failedToDosByDate);
   return (
     <Container>
       <FirstItem>
@@ -242,44 +247,50 @@ export default Feedback = ({ data }) => {
         </View>
       </DateSetting>
       <Overview>
-        <OverviewItem onPress={() => goToDetail(finishedToDosByDate, true)}>
+        <OverviewItem
+          width={screenWidth / 2.5}
+          onPress={() => goToDetail(finishedToDosByDate, true)}
+        >
           <AccentFont>성공</AccentFont>
           <AccentFont>{finishedToDosByDate.length}</AccentFont>
         </OverviewItem>
 
-        <FailOverview onPress={() => goToDetail(failedToDosByDate, false)}>
+        <FailOverview
+          width={screenWidth / 2.5}
+          onPress={() => goToDetail(failedToDosByDate, false)}
+        >
           <FailText>실패</FailText>
           <FailText>{failedToDosByDate.length}</FailText>
         </FailOverview>
-        {/* <Statics>
-          <LineChart
-            data={tempData}
-            width={screenWidth - 45}
-            height={220}
-            chartConfig={{
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              backgroundGradientFrom: "rgba(255, 255, 255, 0.2)",
-              backgroundGradientTo: "rgba(255, 255, 255, 0.2)",
-              decimalPlaces: 0, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: "5",
-                strokeWidth: "1",
-                stroke: "rgb(255,255,255)",
-              },
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
-          />
-        </Statics> */}
       </Overview>
+      <Statics>
+        <LineChart
+          data={tempData}
+          width={screenWidth - 45}
+          height={220}
+          chartConfig={{
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+            backgroundGradientFrom: "rgba(255, 255, 255, 0.2)",
+            backgroundGradientTo: "rgba(255, 255, 255, 0.2)",
+            decimalPlaces: 0, // optional, defaults to 2dp
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+            propsForDots: {
+              r: "5",
+              strokeWidth: "1",
+              stroke: "rgb(255,255,255)",
+            },
+          }}
+          bezier
+          style={{
+            marginVertical: 8,
+            borderRadius: 16,
+          }}
+        />
+      </Statics>
     </Container>
   );
 };
@@ -290,17 +301,20 @@ const Container = styled.ScrollView`
   padding: 15px 25px;
 `;
 const Overview = styled.View`
-  margin-top: 15px;
+  flex-direction: row;
+  justify-content: space-between;
 `;
 const OverviewItem = styled.TouchableOpacity`
+  width: ${(props) => props.width}px;
   flex-direction: row;
   justify-content: space-between;
   margin-top: 15px;
   padding: 15px 15px 0px 0px;
   border-bottom-width: 2px;
+  border-color: rgb(82, 196, 26);
 `;
 const FailOverview = styled(OverviewItem)`
-  border-color: #a82e2e;
+  border-color: rgb(255, 77, 79);
 `;
 const DateSetting = styled.View`
   flex-direction: row;
@@ -314,10 +328,11 @@ const FirstItem = styled.View`
 `;
 const AccentFont = styled.Text`
   font-size: 22px;
+  color: rgb(82, 196, 26);
   font-family: "BM-Pro";
 `;
 const FailText = styled(AccentFont)`
-  color: #a82e2e;
+  color: rgb(255, 77, 79);
 `;
 const BigFont = styled.Text`
   font-size: 28px;

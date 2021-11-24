@@ -144,6 +144,7 @@ export default Profile = ({
     setFinishedToDos(finished);
     setFailedToDos(failed);
     await AsyncStorage.setItem(loggedInUser.uid, JSON.stringify(tempToDos));
+    alert("불러오기 완료");
   };
   return (
     <Container>

@@ -66,11 +66,10 @@ export default Add = ({ uid, toDos, setToDos }) => {
     newToDos.sort(function (a, b) {
       return a.deadline - b.deadline;
     });
-    console.log(newAllToDos);
-    // setToDos(newToDos);
-    // await AsyncStorage.setItem(uid, JSON.stringify(newAllToDos));
-    // navigation.navigate("Home2");
-    // addDoc(collection(dbService, "todo"), todoObj);
+    setToDos(newToDos);
+    await AsyncStorage.setItem(uid, JSON.stringify(newAllToDos));
+    navigation.navigate("Home2");
+    addDoc(collection(dbService, "todo"), todoObj);
   };
   useEffect(() => {
     register("todo", { required: true });
