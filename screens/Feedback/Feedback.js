@@ -23,6 +23,8 @@ export default Feedback = ({ data }) => {
   const theMonth = today.getMonth();
   const theDate = today.getDate();
   const theDayOfWeek = today.getDay();
+  const [failedList, setFailedList] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [finishedList, setFinishedList] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   const tempStartDate = new Date(
     theYear,
@@ -152,12 +154,21 @@ export default Feedback = ({ data }) => {
         todoObj.deadline >= startDate.valueOf() &&
         todoObj.deadline <= endDate.valueOf()
     );
+    // 하루 = 86400000
     setFailedToDosByDate(tempFTodosArr);
-    finishedToDosByDate.map((todo) => {
-      console.log("HELLO", new Date(todo.deadline));
+  }, [startDate]);
+  useEffect(() => {
+    let tempFailedList = [0, 0, 0, 0, 0, 0, 0];
+    let tempFinishedList = [0, 0, 0, 0, 0, 0, 0];
+    finishedToDosByDate.forEach((todo) => {
+      tempFailedList[(todo.deadline - startDate.valueOf()) / 86400000] += 1;
     });
-    failedToDosByDate.map((todo) => {});
-  }, [startDate, failedToDos, finishedToDos]);
+    failedToDosByDate.forEach((todo) => {
+      tempFinishedList[(todo.deadline - startDate.valueOf()) / 86400000] += 1;
+    });
+    setFailedList(tempFailedList);
+    setFinishedList(tempFinishedList);
+  }, [finishedToDosByDate]);
   const goToDetail = (todos, isFinished) => {
     navigation.navigate("Detail", {
       todos,
@@ -169,12 +180,12 @@ export default Feedback = ({ data }) => {
     labels,
     datasets: [
       {
-        data: [0, 0, 0, 1, 0, 0],
+        data: failedList,
         color: () => `rgba(82, 196, 26, ${1})`,
         strokeWidth: 3,
       },
       {
-        data: [1, 2, 0, 0, 0, 3],
+        data: finishedList,
         color: () => `rgba(255, 77, 79, ${1})`,
         strokeWidth: 3,
       },
@@ -182,7 +193,6 @@ export default Feedback = ({ data }) => {
   };
 
   const screenWidth = Dimensions.get("window").width;
-  console.log(failedToDosByDate);
   return (
     <Container>
       <FirstItem>

@@ -5,14 +5,11 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { windowWidth } from "../../components/dimension";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default Detail = ({ route }) => {
-  console.log("ROUTE", route);
   const {
     params: { todos, isFinished, setToDos },
   } = route;
   const [currentToDos, setCurrentToDos] = useState(todos);
-  useEffect(() => {
-    console.log("HELLO");
-  }, [todos]);
+
   const handlerLongClick = (item) => {
     //handler for Long Click
     handleDelete(item);
@@ -35,7 +32,7 @@ export default Detail = ({ route }) => {
               tempToDos = JSON.parse(s);
             }
             const newAllToDos = tempToDos.filter((todo) => todo.id !== item.id);
-            const newToDos = todos.filter((todo) => todo.id !== item.id);
+            const newToDos = currentToDos.filter((todo) => todo.id !== item.id);
             await AsyncStorage.setItem(item.uid, JSON.stringify(newAllToDos));
             setToDos(newToDos);
             setCurrentToDos(newToDos);

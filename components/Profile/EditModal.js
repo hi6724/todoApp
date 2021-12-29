@@ -19,7 +19,6 @@ export default EditModal = ({
   setLoggedInUser,
 }) => {
   const { uid, displayName, photoURL, email } = loggedInUser;
-  console.log(displayName);
   const { register, setValue, handleSubmit, watch, getValues } = useForm();
   useEffect(() => {
     register("username", { required: true });

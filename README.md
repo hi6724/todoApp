@@ -1,12 +1,17 @@
 todo
 
 Profile
-[] Info Screen
-[] Edit Profile
+[x] Info Screen
+[x] Edit Profile
 
 Home
-[] Recommend Page
+[x] Recommend Page
 
 Feedback
-[] FinishedToDos
-[] FailedToDos
+[x] FinishedToDos
+[x] FailedToDos
+
+[] refactoring
+[] calender picker make to can select deadline only Add Screen and Edit Screen
+[] notification before deadline
+[] finish fail notification when reloading
